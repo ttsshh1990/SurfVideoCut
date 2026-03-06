@@ -60,6 +60,12 @@
       margin: 0 0 10px 0;
       font-size: 17px;
     }
+    .card-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
     .card p { margin: 0 0 12px; color: var(--muted); }
     label {
       display: block;
@@ -200,17 +206,199 @@
       width: 100%;
       height: 100%;
     }
+    .help-button {
+      min-width: 42px;
+      justify-content: center;
+      font-size: 15px;
+      padding: 10px 12px;
+    }
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(6, 10, 20, 0.72);
+      backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 28px;
+      z-index: 999;
+    }
+    .modal-backdrop[hidden] {
+      display: none;
+    }
+    .modal {
+      width: min(920px, 100%);
+      max-height: min(86vh, 900px);
+      overflow: auto;
+      border-radius: 22px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background:
+        radial-gradient(circle at top right, rgba(83, 243, 195, 0.1), transparent 30%),
+        radial-gradient(circle at left center, rgba(124, 183, 255, 0.12), transparent 34%),
+        rgba(10, 15, 31, 0.96);
+      box-shadow: 0 30px 100px rgba(0, 0, 0, 0.45);
+      padding: 26px;
+    }
+    .modal-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+    .modal-top h2 {
+      margin: 0 0 6px 0;
+      font-size: 28px;
+    }
+    .modal-top p {
+      margin: 0;
+      color: var(--muted);
+      max-width: 560px;
+      line-height: 1.5;
+    }
+    .guide-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+    .guide-step {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+      padding: 16px;
+    }
+    .guide-kicker {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 999px;
+      background: rgba(83, 243, 195, 0.14);
+      color: var(--accent);
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+    .guide-step h4 {
+      margin: 0 0 8px 0;
+      font-size: 16px;
+    }
+    .guide-step p {
+      margin: 0 0 10px 0;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+    .guide-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .guide-tag {
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: rgba(124, 183, 255, 0.12);
+      border: 1px solid rgba(124, 183, 255, 0.18);
+      color: var(--text);
+      font-size: 12px;
+    }
+    .guide-footer {
+      margin-top: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      color: var(--muted);
+    }
+    @media (max-width: 900px) {
+      .guide-grid {
+        grid-template-columns: 1fr;
+      }
+      .modal {
+        padding: 18px;
+      }
+      .modal-top h2 {
+        font-size: 24px;
+      }
+    }
+    .tour-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(5, 9, 18, 0.62);
+      backdrop-filter: blur(4px);
+      z-index: 999;
+    }
+    .tour-backdrop[hidden] {
+      display: none;
+    }
+    .tour-target {
+      position: relative;
+      z-index: 1001;
+      border-radius: 16px;
+      box-shadow: 0 0 0 2px rgba(83, 243, 195, 0.9), 0 0 0 10px rgba(83, 243, 195, 0.14);
+    }
+    .tour-pop {
+      position: fixed;
+      z-index: 1002;
+      width: min(360px, calc(100vw - 24px));
+      background:
+        radial-gradient(circle at top right, rgba(83, 243, 195, 0.11), transparent 34%),
+        rgba(10, 15, 31, 0.97);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 18px;
+      padding: 18px;
+      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.42);
+    }
+    .tour-pop[hidden] {
+      display: none;
+    }
+    .tour-step {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(83, 243, 195, 0.14);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+    .tour-pop h4 {
+      margin: 0 0 8px 0;
+      font-size: 18px;
+    }
+    .tour-pop p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+    .tour-actions {
+      margin-top: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .tour-actions .group {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
   </style>
 </head>
 <body>
   <main>
     <section class="card" style="grid-column: 1 / -1;">
-      <h3>Source</h3>
+      <div class="card-head">
+        <h3>Source</h3>
+        <button class="button secondary help-button" id="quickStartBtn" title="Quick Start">?</button>
+      </div>
       <p>Pick SD root or load an existing video/segments.</p>
       <div class="grid-2" style="gap:12px;">
         <div>
           <label>SD root</label>
-          <div class="field-row">
+          <div class="field-row" id="sdRootField">
             <input id="sdRootPath" placeholder="/Volumes/SD" />
             <button class="button secondary small" id="sdAuto">Load</button>
             <button class="button secondary small" id="sdOpen">Open</button>
@@ -226,7 +414,7 @@
         </div>
         <div>
           <label>Output folder</label>
-          <div class="field-row">
+          <div class="field-row" id="outdirField">
             <input id="outdirPath" placeholder="~/Videos/SurfSessions/2025-10-11" />
             <button class="button secondary small" id="outdirOpenBtn">Open</button>
           </div>
@@ -237,10 +425,10 @@
           </div>
         </div>
       </div>
-      <div style="margin-top:12px; display:flex; gap:8px; flex-wrap:wrap;">
-        <button class="button">Run All</button>
-        <button class="button">Combine</button>
-        <button class="button">Detection</button>
+      <div id="actionBar" style="margin-top:12px; display:flex; gap:8px; flex-wrap:wrap;">
+        <button class="button" id="runAllBtn">Run All</button>
+        <button class="button" id="combineBtn">Combine</button>
+        <button class="button" id="detectBtn">Detection</button>
         <button class="button" id="cleanBtn">Clean</button>
         <button class="button" id="exportBtn">Export</button>
         <span id="sourceStatus" class="status-pill" style="display:none;">Idle</span>
@@ -288,7 +476,7 @@
       </details>
     </section>
 
-    <section class="card" style="grid-column: 1 / -1;">
+    <section class="card" id="reviewCard" style="grid-column: 1 / -1;">
       <h3>Review &amp; Edit</h3>
       <p>Scrub the video and adjust segments. Drag band edges to trim.</p>
       <div class="review-grid">
@@ -328,6 +516,21 @@
       </div>
     </section>
   </main>
+  <div class="tour-backdrop" id="quickStartOverlay" hidden></div>
+  <div class="tour-pop" id="quickStartPop" hidden>
+    <div class="tour-step" id="quickStartStepLabel">Step 1 of 7</div>
+    <h4 id="quickStartTitle">Choose the source</h4>
+    <p id="quickStartBody">Load or open the source for this work session.</p>
+    <div class="tour-actions">
+      <div class="group">
+        <button class="button secondary small" id="quickStartSkip">Skip</button>
+        <button class="button secondary small" id="quickStartPrev">Back</button>
+      </div>
+      <div class="group">
+        <button class="button small" id="quickStartNext">Next</button>
+      </div>
+    </div>
+  </div>
 </body>
 <script>
 (() => {
@@ -385,13 +588,119 @@
     sdOpen: document.getElementById('sdOpen'),
     sdLoad: document.getElementById('sdAuto'),
     exportBtn: document.getElementById('exportBtn'),
+    combineBtn: document.getElementById('combineBtn'),
+    detectBtn: document.getElementById('detectBtn'),
+    actionBar: document.getElementById('actionBar'),
+    sdRootField: document.getElementById('sdRootField'),
+    outdirField: document.getElementById('outdirField'),
+    reviewCard: document.getElementById('reviewCard'),
     segmentsPath: document.getElementById('segmentsPath'),
     segmentsOpenBtn: document.getElementById('segmentsOpenBtn'),
     sourceStatus: document.getElementById('sourceStatus'),
+    quickStartBtn: document.getElementById('quickStartBtn'),
+    quickStartOverlay: document.getElementById('quickStartOverlay'),
+    quickStartPop: document.getElementById('quickStartPop'),
+    quickStartStepLabel: document.getElementById('quickStartStepLabel'),
+    quickStartTitle: document.getElementById('quickStartTitle'),
+    quickStartBody: document.getElementById('quickStartBody'),
+    quickStartPrev: document.getElementById('quickStartPrev'),
+    quickStartNext: document.getElementById('quickStartNext'),
+    quickStartSkip: document.getElementById('quickStartSkip'),
   };
   // Persistence helpers
   const savePref = (k, v) => { try { localStorage.setItem(k, v || ''); } catch (_) {} };
   const loadPref = (k) => { try { return localStorage.getItem(k) || ''; } catch (_) { return ''; } };
+
+  const tourSteps = [
+    {
+      target: () => el.sdRootField,
+      title: 'SD Root',
+      body: 'Use Load to automatically detect the latest SoloShot session folder from the SD card. Use Open to manually select the SD session folder if needed.',
+    },
+    {
+      target: () => el.outdirField,
+      title: 'Output Folder',
+      body: 'Choose or create the folder used for this work session. Combined video, segment file, and exported clips all use this as the base output location.',
+    },
+    {
+      target: () => el.combineBtn,
+      title: 'Combine',
+      body: 'Combine merges the small MP4 parts from the selected SD root into one long video and then loads that combined video into the editor.',
+    },
+    {
+      target: () => el.detectBtn,
+      title: 'Detection (Optional)',
+      body: 'Detection runs the auto-detection script on the currently loaded video and loads the suggested surf segments. You can still manually adjust or delete every result.',
+    },
+    {
+      target: () => el.reviewCard,
+      title: 'Manual Edit',
+      body: 'Review the long video here, click the timeline to seek, drag clip edges to trim, and use Add clip from playhead to manually create cuts.',
+    },
+    {
+      target: () => el.exportBtn,
+      title: 'Export',
+      body: 'Export writes the current cut list to clips under output/clips/. Only the clips currently shown in the editor are exported.',
+    },
+    {
+      target: () => el.cleanBtn,
+      title: 'Clean',
+      body: 'Clean permanently removes the selected SD session folder. This is unrecoverable. Use it only after you confirm combine/export work is complete.',
+    }
+  ];
+  let quickStartIndex = 0;
+
+  const clearTourHighlight = () => {
+    document.querySelectorAll('.tour-target').forEach((node) => node.classList.remove('tour-target'));
+  };
+
+  const positionTourPop = (target) => {
+    if (!target || !el.quickStartPop) return;
+    const rect = target.getBoundingClientRect();
+    const pop = el.quickStartPop;
+    const gap = 14;
+    const maxLeft = window.innerWidth - pop.offsetWidth - 12;
+    let top = rect.bottom + gap;
+    if (top + pop.offsetHeight > window.innerHeight - 12) {
+      top = Math.max(12, rect.top - pop.offsetHeight - gap);
+    }
+    let left = rect.left;
+    if (left > maxLeft) left = maxLeft;
+    if (left < 12) left = 12;
+    pop.style.top = `${top}px`;
+    pop.style.left = `${left}px`;
+  };
+
+  const renderQuickStart = () => {
+    const step = tourSteps[quickStartIndex];
+    const target = step?.target?.();
+    if (!step || !target) return;
+    clearTourHighlight();
+    target.classList.add('tour-target');
+    target.scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'smooth' });
+    el.quickStartOverlay.hidden = false;
+    el.quickStartPop.hidden = false;
+    el.quickStartStepLabel.textContent = `Step ${quickStartIndex + 1} of ${tourSteps.length}`;
+    el.quickStartTitle.textContent = step.title;
+    el.quickStartBody.textContent = step.body;
+    el.quickStartPrev.disabled = quickStartIndex === 0;
+    el.quickStartNext.textContent = quickStartIndex === tourSteps.length - 1 ? 'Finish' : 'Next';
+    requestAnimationFrame(() => positionTourPop(target));
+  };
+
+  const setQuickStartOpen = (open, index = 0) => {
+    if (!el.quickStartOverlay || !el.quickStartPop) return;
+    if (!open) {
+      clearTourHighlight();
+      el.quickStartOverlay.hidden = true;
+      el.quickStartPop.hidden = true;
+      document.body.style.overflow = '';
+      return;
+    }
+    quickStartIndex = Math.max(0, Math.min(tourSteps.length - 1, index));
+    document.body.style.overflow = 'hidden';
+    renderQuickStart();
+  };
 
   const loadVideoFromPath = (path) => {
     if (!path) return;
@@ -411,6 +720,7 @@
   if (lastSd && el.sdRootPath) el.sdRootPath.value = lastSd;
   const lastOut = loadPref('lastOutdir');
   if (lastOut && el.outdirPath) el.outdirPath.value = lastOut;
+  setQuickStartOpen(true);
   // Helpers
   const fmt = (s) => {
     if (!isFinite(s)) return '--:--';
@@ -673,6 +983,23 @@
     alert('Saved segments (stub).');
   });
 
+  el.quickStartBtn?.addEventListener('click', () => setQuickStartOpen(true, 0));
+  el.quickStartSkip?.addEventListener('click', () => setQuickStartOpen(false));
+  el.quickStartPrev?.addEventListener('click', () => {
+    if (quickStartIndex > 0) {
+      quickStartIndex -= 1;
+      renderQuickStart();
+    }
+  });
+  el.quickStartNext?.addEventListener('click', () => {
+    if (quickStartIndex >= tourSteps.length - 1) {
+      setQuickStartOpen(false);
+      return;
+    }
+    quickStartIndex += 1;
+    renderQuickStart();
+  });
+
   const isTypingTarget = (t) => {
     if (!t) return false;
     const tag = t.tagName?.toLowerCase();
@@ -692,6 +1019,11 @@
     el.video.currentTime = Math.max(0, Math.min(state.duration, el.video.currentTime + delta));
   };
   const keyHandler = (e) => {
+    if (!el.quickStartOverlay.hidden && e.key === 'Escape') {
+      e.preventDefault();
+      setQuickStartOpen(false);
+      return;
+    }
     if (!state.duration || isTypingTarget(e.target)) return;
     if (e.key === 'ArrowLeft' || e.key === 'ArrowRight' || e.key === 'Delete' || e.key === 'Backspace') {
       e.preventDefault();
@@ -719,6 +1051,12 @@
   };
   document.addEventListener('keydown', keyHandler, true);
   document.addEventListener('keyup', keyUpHandler, true);
+  window.addEventListener('resize', () => {
+    if (!el.quickStartOverlay.hidden) renderQuickStart();
+  });
+  window.addEventListener('scroll', () => {
+    if (!el.quickStartOverlay.hidden) positionTourPop(tourSteps[quickStartIndex]?.target?.());
+  }, true);
 
   el.mp4OpenBtn.addEventListener('click', () => {
     console.log('[mp4] Open clicked');
