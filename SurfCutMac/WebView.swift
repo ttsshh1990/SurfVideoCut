@@ -63,9 +63,16 @@ struct WebView: NSViewRepresentable {
         private func checkStartupEnvironment(webView: WKWebView) {
             DispatchQueue.global(qos: .utility).async {
                 let env = self.processEnvironment()
-                let pythonResult = self.runTool(args: ["python3", "--version"], environment: env)
-                let pythonOK = pythonResult.status == 0
-                let pythonMsg = pythonOK ? (pythonResult.output.isEmpty ? "python3 available" : pythonResult.output) : (pythonResult.output.isEmpty ? "python3 not found" : pythonResult.output)
+                let pythonPath = self.resolvePythonExecutable(environment: env)
+                let pythonOK = pythonPath != nil
+                let pythonMsg: String
+                if let pythonPath {
+                    let pythonResult = self.runCommand(executablePath: pythonPath, arguments: ["--version"], environment: env)
+                    let version = pythonResult.output.isEmpty ? "python3 available" : pythonResult.output
+                    pythonMsg = "\(version) (\(pythonPath))"
+                } else {
+                    pythonMsg = "python3 not found"
+                }
                 let ffmpegPath = self.bundledFFmpegPath()
                 let ffmpegOK = FileManager.default.isExecutableFile(atPath: ffmpegPath)
                 let ffmpegMsg = ffmpegOK ? ffmpegPath : "Bundled ffmpeg missing"
@@ -78,9 +85,33 @@ struct WebView: NSViewRepresentable {
         private func processEnvironment() -> [String: String] {
             var env = ProcessInfo.processInfo.environment
             let bundledBin = bundledBinPath()
-            let existing = env["PATH"] ?? "/usr/bin:/bin"
-            env["PATH"] = "\(bundledBin):\(existing)"
+            let existing = env["PATH"] ?? "/usr/bin:/bin:/usr/sbin:/sbin"
+            let extra = ["/opt/homebrew/bin", "/usr/local/bin"]
+            env["PATH"] = ([bundledBin] + extra + [existing]).joined(separator: ":")
             return env
+        }
+
+        private func resolvePythonExecutable(environment: [String: String]) -> String? {
+            var candidates: [String] = []
+            let pathEntries = (environment["PATH"] ?? "").split(separator: ":").map(String.init)
+            candidates.append(contentsOf: pathEntries.map { "\($0)/python3" })
+            candidates.append(contentsOf: [
+                "/opt/homebrew/bin/python3",
+                "/usr/local/bin/python3",
+                "/usr/bin/python3"
+            ])
+
+            var seen = Set<String>()
+            for candidate in candidates {
+                guard !candidate.isEmpty, !seen.contains(candidate) else { continue }
+                seen.insert(candidate)
+                guard FileManager.default.isExecutableFile(atPath: candidate) else { continue }
+                let result = runCommand(executablePath: candidate, arguments: ["--version"], environment: environment)
+                if result.status == 0 {
+                    return candidate
+                }
+            }
+            return nil
         }
 
         private func bundledBinPath() -> String {
@@ -91,10 +122,10 @@ struct WebView: NSViewRepresentable {
             Bundle.main.resourceURL?.appendingPathComponent("surf_video_cut/bin/ffmpeg").path ?? "ffmpeg"
         }
 
-        private func runTool(args: [String], environment: [String: String]) -> (status: Int32, output: String) {
+        private func runCommand(executablePath: String, arguments: [String], environment: [String: String]) -> (status: Int32, output: String) {
             let proc = Process()
-            proc.executableURL = URL(fileURLWithPath: "/usr/bin/env")
-            proc.arguments = args
+            proc.executableURL = URL(fileURLWithPath: executablePath)
+            proc.arguments = arguments
             proc.environment = environment
             let pipe = Pipe()
             proc.standardOutput = pipe
@@ -197,10 +228,15 @@ struct WebView: NSViewRepresentable {
             }
 
             let scriptPath = Bundle.main.resourceURL?.appendingPathComponent("surf_video_cut/cut_video.py").path ?? "cut_video.py"
+            let env = processEnvironment()
+            guard let pythonPath = resolvePythonExecutable(environment: env) else {
+                notifyExport(webView: webView, ok: false, message: "python3 not found")
+                return
+            }
             let proc = Process()
-            proc.executableURL = URL(fileURLWithPath: "/usr/bin/env")
-            proc.arguments = ["python3", scriptPath, "--input", videoPath, "--outdir", clipsDir, "--segments-file", tempSegments.path, "--jobs", "\(jobs)", "--keep-audio"]
-            proc.environment = processEnvironment()
+            proc.executableURL = URL(fileURLWithPath: pythonPath)
+            proc.arguments = [scriptPath, "--input", videoPath, "--outdir", clipsDir, "--segments-file", tempSegments.path, "--jobs", "\(jobs)", "--keep-audio"]
+            proc.environment = env
             let pipe = Pipe()
             proc.standardOutput = pipe
             proc.standardError = pipe
@@ -264,10 +300,16 @@ struct WebView: NSViewRepresentable {
                     return
                 }
                 let scriptPath = Bundle.main.resourceURL?.appendingPathComponent("surf_video_cut/combine_simple.py").path ?? "combine_simple.py"
-                let proc = Process()
-                proc.executableURL = URL(fileURLWithPath: "/usr/bin/env")
-                proc.arguments = ["python3", scriptPath, "--sd-root", sdRoot, "--outdir", outdir]
                 var env = self.processEnvironment()
+                guard let pythonPath = self.resolvePythonExecutable(environment: env) else {
+                    DispatchQueue.main.async {
+                        self.notifyCombine(webView: webView, ok: false, message: "python3 not found")
+                    }
+                    return
+                }
+                let proc = Process()
+                proc.executableURL = URL(fileURLWithPath: pythonPath)
+                proc.arguments = [scriptPath, "--sd-root", sdRoot, "--outdir", outdir]
                 env["PYTHONUNBUFFERED"] = "1"
                 proc.environment = env
                 let pipe = Pipe()
@@ -357,9 +399,28 @@ struct WebView: NSViewRepresentable {
             let activityPath = resourcesURL?.appendingPathComponent("models/activity_classifier.pth").path
             DispatchQueue.global(qos: .userInitiated).async {
                 let scriptPath = Bundle.main.resourceURL?.appendingPathComponent("surf_video_cut/process_improved.py").path ?? "process_improved.py"
+                var env = self.processEnvironment()
+                guard let pythonPath = self.resolvePythonExecutable(environment: env) else {
+                    DispatchQueue.main.async {
+                        self.notifyDetect(webView: webView, ok: false, message: "python3 not found")
+                    }
+                    return
+                }
+                let moduleCheck = self.runCommand(
+                    executablePath: pythonPath,
+                    arguments: ["-c", "import torch, torchvision, cv2, ultralytics, tqdm"],
+                    environment: env
+                )
+                if moduleCheck.status != 0 {
+                    let detail = moduleCheck.output.isEmpty ? "Required Python packages are missing for detection." : moduleCheck.output
+                    DispatchQueue.main.async {
+                        self.notifyDetect(webView: webView, ok: false, message: "Detection dependencies not available in \(pythonPath)\\n\(detail)")
+                    }
+                    return
+                }
                 let proc = Process()
-                proc.executableURL = URL(fileURLWithPath: "/usr/bin/env")
-                var args = ["python3", scriptPath, "--input", videoPath, "--outdir", outdir]
+                proc.executableURL = URL(fileURLWithPath: pythonPath)
+                var args = [scriptPath, "--input", videoPath, "--outdir", outdir]
                 if let modelPath = modelPath {
                     args += ["--model", modelPath]
                 }
@@ -367,7 +428,6 @@ struct WebView: NSViewRepresentable {
                     args += ["--activity-model", activityPath]
                 }
                 proc.arguments = args
-                var env = self.processEnvironment()
                 env["PYTHONUNBUFFERED"] = "1"
                 proc.environment = env
                 let pipe = Pipe()

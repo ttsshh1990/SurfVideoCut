@@ -49,6 +49,18 @@ Notes:
 - Detection additionally requires Python ML packages such as `torch`, `torchvision`, `opencv-python`, `ultralytics`, and `tqdm`.
 - If `python3` is missing, the app will warn at startup.
 
+If macOS says the downloaded app is damaged, remove the quarantine attribute and open it again:
+
+```bash
+xattr -dr com.apple.quarantine /path/to/SurfCutMac.app
+```
+
+Example:
+
+```bash
+xattr -dr com.apple.quarantine ~/Downloads/SurfCutMac.app
+```
+
 ## Option 2: Build locally from source
 
 ### Requirements
