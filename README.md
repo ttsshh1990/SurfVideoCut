@@ -37,6 +37,11 @@ When a release is available:
 4. Move `SurfCutMac.app` into `/Applications` if you want.
 5. Launch it with right-click -> `Open` the first time.
 
+Releases can be produced either:
+
+- manually by building and zipping the app
+- automatically by pushing a git tag like `v0.1.0`
+
 Notes:
 
 - `ffmpeg` is bundled inside the app.
@@ -118,6 +123,24 @@ ditto -c -k --sequesterRsrc --keepParent \
 ```
 
 Upload `SurfCutMac.zip` to a GitHub Release.
+
+## Maintainer: automated GitHub release
+
+This repo includes a GitHub Actions workflow that:
+
+- builds `SurfCutMac.app` on macOS
+- zips it as `SurfCutMac.zip`
+- uploads it as a workflow artifact
+- publishes it to GitHub Releases when you push a tag like `v0.1.0`
+
+To create a downloadable release:
+
+```bash
+git tag v0.1.0
+git push origin v0.1.0
+```
+
+After the workflow finishes, download the app from the GitHub Release asset.
 
 ## Repo layout
 

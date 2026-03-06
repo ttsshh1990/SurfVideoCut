@@ -1,0 +1,42 @@
+name: Build SurfCutMac
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Build app
+        run: |
+          xcodebuild \
+            -project SurfCutMac.xcodeproj \
+            -scheme SurfCutMac \
+            -configuration Release \
+            -derivedDataPath .deriveddata \
+            build CODE_SIGNING_ALLOWED=NO
+
+      - name: Package app
+        run: |
+          ditto -c -k --sequesterRsrc --keepParent \
+            .deriveddata/Build/Products/Release/SurfCutMac.app \
+            SurfCutMac.zip
+
+      - name: Upload workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: SurfCutMac
+          path: SurfCutMac.zip
+
+      - name: Publish GitHub Release asset
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: SurfCutMac.zip
