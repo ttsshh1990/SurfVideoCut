@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Surf Video Cut — Mock UI</title>
+  <style>
+    :root {
+      --bg: #0b1021;
+      --panel: rgba(255, 255, 255, 0.04);
+      --panel-strong: rgba(255, 255, 255, 0.08);
+      --accent: #53f3c3;
+      --accent-2: #7cb7ff;
+      --text: #ecf2ff;
+      --muted: #9fb2d0;
+      --danger: #ff6b6b;
+      --success: #7becb1;
+      --radius: 14px;
+      --shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+    }
+    * { box-sizing: border-box; }
+  body {
+      margin: 0;
+      font-family: "SF Pro Display", "Avenir Next", "Segoe UI", sans-serif;
+      color: var(--text);
+      background: radial-gradient(circle at 20% 20%, rgba(124, 183, 255, 0.08), transparent 35%), radial-gradient(circle at 80% 10%, rgba(83, 243, 195, 0.1), transparent 40%), var(--bg);
+      min-height: 100vh;
+      padding: 28px 34px;
+      display: grid;
+      gap: 16px;
+      overflow-x: hidden;
+    }
+    main {
+      display: grid;
+      grid-template-rows: auto auto auto;
+      gap: 16px;
+    }
+    .review-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 2.8fr) minmax(0, 0.9fr);
+      gap: 16px;
+      align-items: start;
+    }
+    .pane-left { min-width: 0; }
+    .pane-right { min-width: 0; }
+    .layout {
+      display: grid;
+      grid-template-columns: 2fr 1.2fr;
+      gap: 16px;
+      align-items: start;
+    }
+    .card {
+      background: var(--panel);
+      border-radius: var(--radius);
+      border: 1px solid rgba(255,255,255,0.08);
+      padding: 18px;
+      box-shadow: var(--shadow);
+    }
+    .card h3 {
+      margin: 0 0 10px 0;
+      font-size: 17px;
+    }
+    .card p { margin: 0 0 12px; color: var(--muted); }
+    label {
+      display: block;
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    input, select {
+      width: 100%;
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.05);
+      color: var(--text);
+      margin-bottom: 12px;
+    }
+    .button {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 14px;
+      border-radius: 12px;
+      border: none;
+      color: #0b0f1f;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      cursor: pointer;
+      font-weight: 600;
+      box-shadow: var(--shadow);
+      transition: 120ms ease;
+    }
+    .button.secondary {
+      background: rgba(255,255,255,0.08);
+      color: var(--text);
+      box-shadow: none;
+    }
+    .button:active { transform: translateY(1px); }
+    .button.small {
+      padding: 8px 10px;
+      font-size: 12px;
+      box-shadow: none;
+    }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .field-row { display: flex; gap: 8px; align-items: center; }
+    .field-row input { flex: 1; margin-bottom: 0; }
+    .preset-row { display: flex; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
+    .chip {
+      padding: 9px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.05);
+      cursor: pointer;
+      color: var(--muted);
+    }
+    .chip.active {
+      background: rgba(83, 243, 195, 0.12);
+      border-color: rgba(83, 243, 195, 0.4);
+      color: var(--text);
+    }
+    .timeline-wrap {
+      position: relative;
+      background: rgba(255,255,255,0.04);
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.08);
+      height: 64px;
+      margin-top: 10px;
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding: 4px 0;
+    }
+    .timeline {
+      position: relative;
+      height: 100%;
+      min-width: 800px;
+    }
+    .band {
+      position: absolute;
+      top: 6px; bottom: 6px;
+      background: rgba(83, 243, 195, 0.35);
+      border-left: 2px solid rgba(83, 243, 195, 0.9);
+      border-right: 2px solid rgba(83, 243, 195, 0.9);
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .band.selected {
+      background: rgba(124, 183, 255, 0.45);
+      border-color: rgba(124, 183, 255, 0.9);
+      box-shadow: 0 0 0 2px rgba(124, 183, 255, 0.35);
+    }
+    .handle {
+      position: absolute;
+      top: 0; bottom: 0;
+      width: 8px;
+      background: rgba(255,255,255,0.7);
+      cursor: ew-resize;
+      opacity: 0.7;
+    }
+    .handle.left { left: -4px; }
+    .handle.right { right: -4px; }
+    .playhead {
+      position: absolute;
+      top: 0; bottom: 0;
+      width: 2px;
+      background: rgba(255,255,255,0.7);
+      pointer-events: none;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    th, td {
+      padding: 10px 6px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    th { text-align: left; color: var(--text); font-weight: 600; }
+    .pill {
+      padding: 6px 8px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.07);
+      color: var(--text);
+      font-size: 12px;
+      display: inline-block;
+    }
+    .table-scroll {
+      max-height: 320px;
+      overflow-y: auto;
+    }
+    .file-btn {
+      position: relative;
+      display: inline-block;
+    }
+    .file-btn input[type="file"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="card" style="grid-column: 1 / -1;">
+      <h3>Source</h3>
+      <p>Pick SD root or load an existing video/segments.</p>
+      <div class="grid-2" style="gap:12px;">
+        <div>
+          <label>SD root</label>
+          <div class="field-row">
+            <input id="sdRootPath" placeholder="/Volumes/SD" />
+            <button class="button secondary small" id="sdAuto">Load</button>
+            <button class="button secondary small" id="sdOpen">Open</button>
+          </div>
+          <label>MP4 file</label>
+          <div class="field-row">
+            <input id="mp4Path" placeholder="/videos/Track_...mp4" />
+            <div class="file-btn">
+              <button class="button secondary small" id="mp4OpenBtn">Open</button>
+              <input id="mp4FileInput" type="file" accept="video/mp4,video/*" aria-label="mp4-file-input" />
+            </div>
+          </div>
+        </div>
+        <div>
+          <label>Output folder</label>
+          <div class="field-row">
+            <input id="outdirPath" placeholder="~/Videos/SurfSessions/2025-10-11" />
+            <button class="button secondary small" id="outdirOpenBtn">Open</button>
+          </div>
+          <label>Segments file (optional)</label>
+          <div class="field-row">
+            <input id="segmentsPath" placeholder="auto-detected if present" />
+            <button class="button secondary small" id="segmentsOpenBtn">Open</button>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:12px; display:flex; gap:8px; flex-wrap:wrap;">
+        <button class="button">Run All</button>
+        <button class="button">Combine</button>
+        <button class="button">Detection</button>
+        <button class="button" id="cleanBtn">Clean</button>
+        <button class="button" id="exportBtn">Export</button>
+        <span id="sourceStatus" class="status-pill" style="display:none;">Idle</span>
+      </div>
+      <details style="margin-top:12px;">
+        <summary style="cursor:pointer; color:var(--muted);">Detection options</summary>
+        <div class="card" style="margin-top:10px; background: rgba(255,255,255,0.03);">
+          <p style="margin-top:0;">Adjust detection parameters (optional).</p>
+          <div class="preset-row">
+            <div class="chip">High Recall</div>
+            <div class="chip active">Balanced</div>
+            <div class="chip">High Precision</div>
+          </div>
+          <div class="grid-2">
+            <div>
+              <label>Device</label>
+              <select>
+                <option>auto</option>
+                <option selected>mps</option>
+                <option>cuda</option>
+                <option>cpu</option>
+              </select>
+              <label>Activity threshold</label>
+              <input type="range" min="0.05" max="0.3" step="0.01" value="0.15" />
+              <label>Confidence</label>
+              <input type="range" min="0.15" max="0.35" step="0.01" value="0.25" />
+            </div>
+            <div>
+              <label>Smooth / Merge gap (s)</label>
+              <div class="grid-2">
+                <select>
+                  <option>smooth off</option>
+                  <option selected>smooth on</option>
+                </select>
+                <input type="number" value="1.0" />
+              </div>
+              <label>Preroll / Postroll (s)</label>
+              <div class="grid-2">
+                <input type="number" value="1.5" />
+                <input type="number" value="1.0" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </details>
+    </section>
+
+    <section class="card" style="grid-column: 1 / -1;">
+      <h3>Review &amp; Edit</h3>
+      <p>Scrub the video and adjust segments. Drag band edges to trim.</p>
+      <div class="review-grid">
+        <div class="pane-left">
+          <div style="background:#111829; border-radius:12px; height:460px; margin-bottom:12px; border:1px solid rgba(255,255,255,0.08); display:flex; align-items:center; justify-content:center; color:var(--muted); position:relative;">
+            <video id="player" style="width:100%; height:100%; object-fit:contain; background:#0b0f1f;" controls></video>
+          </div>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <span style="color:var(--muted); font-size:13px;">Timeline zoom</span>
+            <button class="button secondary small" id="zoomOut">-</button>
+            <button class="button secondary small" id="zoomIn">+</button>
+            <button class="button secondary small" id="zoomReset">Reset</button>
+          </div>
+          <div class="timeline-wrap" id="timelineWrap">
+            <div id="timeline" class="timeline">
+              <div id="playhead" class="playhead"></div>
+            </div>
+          </div>
+          <div style="margin-top:12px; display:flex; gap:8px; flex-wrap:wrap;">
+            <button class="button secondary" id="addClip">Add clip from playhead</button>
+            <button class="button secondary" id="undo" disabled>Undo</button>
+            <button class="button secondary" id="save">Save edits</button>
+          </div>
+        </div>
+        <div class="pane-right" style="max-width: 340px;">
+          <h4>Clips</h4>
+          <p style="margin-top:0;">Click a row to preview; delete or fine-tune times.</p>
+          <div class="table-scroll">
+            <table id="clipsTable">
+              <thead>
+                <tr><th>#</th><th>Actions</th></tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</body>
+<script>
+(() => {
+  const origConsoleLog = console.log;
+  console.log = (...args) => {
+    origConsoleLog(...args);
+    try {
+      if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.native) {
+        window.webkit.messageHandlers.native.postMessage({
+          type: 'debug',
+          message: args.map((a) => {
+            if (typeof a === 'object') {
+              try { return JSON.stringify(a); } catch (_) { return String(a); }
+            }
+            return String(a);
+          }).join(' ')
+        });
+      }
+    } catch (_) {
+      // ignore bridge failures
+    }
+  };
+
+  const state = {
+    videoSrc: null,
+    duration: 0,
+    segments: [],
+    selectedId: null,
+    zoom: 1,
+    history: [],
+    historyPos: -1,
+    playUntil: null,
+    pxPerSecond: 0.6, // base scale; zoom multiplies this
+  };
+
+  const el = {
+    video: document.getElementById('player'),
+    timeline: document.getElementById('timeline'),
+    playhead: document.getElementById('playhead'),
+    zoomReset: document.getElementById('zoomReset'),
+    zoomOut: document.getElementById('zoomOut'),
+    zoomIn: document.getElementById('zoomIn'),
+    addClip: document.getElementById('addClip'),
+    undo: document.getElementById('undo'),
+    save: document.getElementById('save'),
+    clipsTable: document.querySelector('#clipsTable tbody'),
+    mp4OpenBtn: document.getElementById('mp4OpenBtn'),
+    mp4FileInput: document.getElementById('mp4FileInput'),
+    mp4Path: document.getElementById('mp4Path'),
+    timelineWrap: document.getElementById('timelineWrap'),
+    outdirOpenBtn: document.getElementById('outdirOpenBtn'),
+    outdirPath: document.getElementById('outdirPath'),
+    sdRootPath: document.getElementById('sdRootPath'),
+    sdAuto: document.getElementById('sdAuto'),
+    sdOpen: document.getElementById('sdOpen'),
+    sdLoad: document.getElementById('sdAuto'),
+    exportBtn: document.getElementById('exportBtn'),
+    segmentsPath: document.getElementById('segmentsPath'),
+    segmentsOpenBtn: document.getElementById('segmentsOpenBtn'),
+    sourceStatus: document.getElementById('sourceStatus'),
+  };
+  // Persistence helpers
+  const savePref = (k, v) => { try { localStorage.setItem(k, v || ''); } catch (_) {} };
+  const loadPref = (k) => { try { return localStorage.getItem(k) || ''; } catch (_) { return ''; } };
+
+  const loadVideoFromPath = (path) => {
+    if (!path) return;
+    state.videoPath = path;
+    if (el.mp4Path) el.mp4Path.value = path;
+    const fileUrl = path.startsWith('file://') ? path : `file://${encodeURI(path)}`;
+    console.log('[video] loadVideoFromPath', fileUrl);
+    el.video.src = fileUrl;
+    el.video.load();
+    state.videoSrc = fileUrl;
+    currentObjectUrl = null;
+  };
+
+
+  // Load persisted paths
+  const lastSd = loadPref('lastSdRoot');
+  if (lastSd && el.sdRootPath) el.sdRootPath.value = lastSd;
+  const lastOut = loadPref('lastOutdir');
+  if (lastOut && el.outdirPath) el.outdirPath.value = lastOut;
+  // Helpers
+  const fmt = (s) => {
+    if (!isFinite(s)) return '--:--';
+    const m = Math.floor(s / 60);
+    const sec = s % 60;
+    return `${m}:${sec.toFixed(2).padStart(5, '0')}`;
+  };
+
+  // Video loading
+  let currentObjectUrl = null;
+  const loadVideoFile = (file) => {
+    if (!file) return;
+    if (currentObjectUrl) URL.revokeObjectURL(currentObjectUrl);
+    const url = URL.createObjectURL(file);
+    currentObjectUrl = url;
+    state.videoSrc = url;
+    if (file.path) {
+      state.videoPath = file.path;
+      savePref('lastVideoPath', file.path);
+    }
+    el.video.src = url;
+    el.video.load();
+    el.mp4Path.value = file.name;
+    state.segments = [];
+    state.selectedId = null;
+    state.duration = 0;
+    state.history = [];
+    state.historyPos = -1;
+    el.undo.disabled = true;
+    render();
+  };
+
+  const pushHistory = () => {
+    state.history = state.history.slice(0, state.historyPos + 1);
+    state.history.push(JSON.parse(JSON.stringify({
+      segments: state.segments,
+      selectedId: state.selectedId,
+    })));
+    state.historyPos = state.history.length - 1;
+    el.undo.disabled = state.historyPos <= 0;
+  };
+
+  const restoreHistory = () => {
+    if (state.historyPos <= 0) return;
+    state.historyPos -= 1;
+    const snap = state.history[state.historyPos];
+    state.segments = JSON.parse(JSON.stringify(snap.segments));
+    state.selectedId = snap.selectedId;
+    render();
+    el.undo.disabled = state.historyPos <= 0;
+  };
+
+  // Segment ops
+  const addSegment = (start, end) => {
+    const dur = Math.max(0.3, end - start);
+    const s = Math.max(0, Math.min(start, state.duration));
+    const e = Math.min(state.duration || dur, s + dur);
+    const id = crypto.randomUUID();
+    state.segments.push({ id, start: s, end: e });
+    state.segments.sort((a, b) => a.start - b.start);
+    state.selectedId = id;
+    pushHistory();
+    render();
+  };
+
+  const deleteSegment = (id) => {
+    state.segments = state.segments.filter((s) => s.id !== id);
+    if (state.selectedId === id) state.selectedId = null;
+    pushHistory();
+    render();
+  };
+
+  const applySegmentsList = (list = [], sourcePath = '') => {
+    if (!Array.isArray(list)) {
+      console.warn('[segments] invalid list payload', list);
+      return;
+    }
+    const normalized = list.map((seg) => {
+      const rawStart = Number(seg.start);
+      const rawEnd = Number(seg.end);
+      if (!isFinite(rawStart) || !isFinite(rawEnd)) return null;
+      const start = Math.max(0, Math.min(rawStart, rawEnd));
+      const end = Math.max(start + 0.1, Math.max(rawStart, rawEnd));
+      return { id: crypto.randomUUID(), start, end };
+    }).filter(Boolean).sort((a, b) => a.start - b.start);
+    state.segments = normalized;
+    state.selectedId = normalized[0]?.id || null;
+    state.history = [];
+    state.historyPos = -1;
+    if (normalized.length) {
+      pushHistory();
+    } else {
+      el.undo.disabled = true;
+    }
+    render();
+    if (sourcePath) {
+      console.log(`[segments] loaded ${normalized.length} from ${sourcePath}`);
+    } else {
+      console.log(`[segments] applied list (${normalized.length})`);
+    }
+  };
+
+  const updateSegment = (id, start, end) => {
+    state.segments = state.segments.map((s) => s.id === id ? { ...s, start, end } : s);
+    render();
+  };
+
+  const selectSegment = (id) => {
+    state.selectedId = id;
+    render();
+  };
+
+  // Rendering
+  const renderTimeline = () => {
+    const dur = state.duration || 1;
+    const width = Math.max(800, dur * state.pxPerSecond * state.zoom);
+    state.timelineWidth = width;
+    el.timeline.style.width = `${width}px`;
+
+    // Clear previous bands
+    el.timeline.querySelectorAll('.band').forEach((b) => b.remove());
+
+    // Playhead
+    const playheadLeft = (el.video.currentTime / dur) * (el.timeline.scrollWidth || width);
+    el.playhead.style.left = `${playheadLeft}px`;
+
+    state.segments.forEach((seg) => {
+      const band = document.createElement('div');
+      band.className = 'band' + (seg.id === state.selectedId ? ' selected' : '');
+      const left = (seg.start / dur) * width;
+      const w = Math.max(4, ((seg.end - seg.start) / dur) * width);
+      band.style.left = `${left}px`;
+      band.style.width = `${w}px`;
+      band.title = `${fmt(seg.start)} - ${fmt(seg.end)}`;
+      band.addEventListener('click', () => {
+        selectSegment(seg.id);
+        playSegment(seg);
+      });
+
+      // Handles for trim
+      const hl = document.createElement('div');
+      hl.className = 'handle left';
+      const hr = document.createElement('div');
+      hr.className = 'handle right';
+      band.appendChild(hl);
+      band.appendChild(hr);
+
+      const startDrag = (edge, evt) => {
+        evt.stopPropagation();
+        const startX = evt.clientX;
+        const orig = { ...seg };
+        const totalW = el.timeline.scrollWidth || state.timelineWidth || 1;
+        const secondsPerPx = (state.duration || 1) / totalW;
+        const move = (ev) => {
+          const dx = ev.clientX - startX;
+          const deltaSec = dx * secondsPerPx;
+          let newStart = orig.start;
+          let newEnd = orig.end;
+          if (edge === 'left') newStart = Math.max(0, Math.min(newEnd - 0.3, orig.start + deltaSec));
+          if (edge === 'right') newEnd = Math.min(state.duration, Math.max(newStart + 0.3, orig.end + deltaSec));
+          updateSegment(seg.id, newStart, newEnd);
+        };
+        const up = () => {
+          document.removeEventListener('mousemove', move);
+          document.removeEventListener('mouseup', up);
+          pushHistory();
+        };
+        document.addEventListener('mousemove', move);
+        document.addEventListener('mouseup', up);
+      };
+      hl.addEventListener('mousedown', (e) => startDrag('left', e));
+      hr.addEventListener('mousedown', (e) => startDrag('right', e));
+
+      el.timeline.appendChild(band);
+    });
+  };
+
+  const renderClips = () => {
+    const tbody = el.clipsTable;
+    tbody.innerHTML = '';
+    state.segments.forEach((seg, idx) => {
+      const tr = document.createElement('tr');
+      if (state.selectedId === seg.id) tr.style.background = 'rgba(255,255,255,0.05)';
+      const tdIdx = document.createElement('td');
+      tdIdx.textContent = String(idx + 1).padStart(2, '0');
+      const tdActions = document.createElement('td');
+      const play = document.createElement('span');
+      play.className = 'pill';
+      play.textContent = 'Play';
+      play.addEventListener('click', () => { selectSegment(seg.id); playSegment(seg); });
+      const del = document.createElement('span');
+      del.className = 'pill';
+      del.style.marginLeft = '6px';
+      del.textContent = 'Delete';
+      del.addEventListener('click', () => deleteSegment(seg.id));
+      tdActions.appendChild(play);
+      tdActions.appendChild(del);
+      tr.appendChild(tdIdx);
+      tr.appendChild(tdActions);
+      tr.addEventListener('click', () => selectSegment(seg.id));
+      tbody.appendChild(tr);
+    });
+  };
+
+  const render = () => {
+    renderTimeline();
+    renderClips();
+  };
+
+  // Playback controls
+  const playSegment = (seg) => {
+    if (!seg) return;
+    state.playUntil = seg.end;
+    el.video.currentTime = seg.start;
+    el.video.play();
+  };
+
+  // Event bindings
+  el.video.addEventListener('loadedmetadata', () => {
+    state.duration = el.video.duration;
+    render();
+    console.log('[video] loadedmetadata duration', state.duration);
+  });
+
+  el.video.addEventListener('timeupdate', () => {
+    const dur = state.duration || 1;
+    const width = Math.max(800, dur * state.pxPerSecond * state.zoom);
+    const playheadLeft = (el.video.currentTime / dur) * (el.timeline.scrollWidth || width);
+    el.playhead.style.left = `${playheadLeft}px`;
+    if (state.playUntil !== null && el.video.currentTime >= state.playUntil) {
+      el.video.pause();
+      state.playUntil = null;
+    }
+  });
+
+  el.video.addEventListener('error', (e) => {
+    console.log('[video] error', e);
+  });
+
+  const clampZoom = (z) => Math.min(4, Math.max(0.5, z));
+  const setZoom = (z) => {
+    state.zoom = clampZoom(z);
+    renderTimeline();
+  };
+  el.zoomOut.addEventListener('click', () => setZoom(state.zoom - 0.2));
+  el.zoomIn.addEventListener('click', () => setZoom(state.zoom + 0.2));
+  el.zoomReset.addEventListener('click', () => setZoom(1));
+
+  el.addClip.addEventListener('click', () => {
+    if (!state.duration || !isFinite(el.video.currentTime)) return;
+    const start = el.video.currentTime;
+    const end = Math.min(state.duration, start + 3);
+    addSegment(start, end);
+  });
+
+  el.undo.addEventListener('click', restoreHistory);
+
+  el.save.addEventListener('click', () => {
+    console.log('Segments saved (stub):', state.segments);
+    alert('Saved segments (stub).');
+  });
+
+  const isTypingTarget = (t) => {
+    if (!t) return false;
+    const tag = t.tagName?.toLowerCase();
+    return tag === 'input' || tag === 'textarea' || t.isContentEditable || tag === 'select';
+  };
+
+  let holdInterval = null;
+  const clearHold = () => {
+    if (holdInterval) {
+      clearInterval(holdInterval);
+      holdInterval = null;
+    }
+  };
+  const nudge = (dir) => {
+    if (!state.duration) return;
+    const delta = dir === 'left' ? -3 : 3;
+    el.video.currentTime = Math.max(0, Math.min(state.duration, el.video.currentTime + delta));
+  };
+  const keyHandler = (e) => {
+    if (!state.duration || isTypingTarget(e.target)) return;
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowRight' || e.key === 'Delete' || e.key === 'Backspace') {
+      e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+    }
+    if (e.key === 'ArrowLeft') {
+      nudge('left');
+      clearHold();
+      holdInterval = setInterval(() => nudge('left'), 150);
+    } else if (e.key === 'ArrowRight') {
+      nudge('right');
+      clearHold();
+      holdInterval = setInterval(() => nudge('right'), 150);
+    } else if (e.key === 'Delete' || e.key === 'Backspace') {
+      if (state.selectedId) {
+        deleteSegment(state.selectedId);
+      }
+    }
+  };
+  const keyUpHandler = (e) => {
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+      clearHold();
+    }
+  };
+  document.addEventListener('keydown', keyHandler, true);
+  document.addEventListener('keyup', keyUpHandler, true);
+
+  el.mp4OpenBtn.addEventListener('click', () => {
+    console.log('[mp4] Open clicked');
+    // overlay file input should handle the click; this is a fallback
+    el.mp4FileInput.click();
+  });
+  el.mp4FileInput.addEventListener('click', () => {
+    console.log('[mp4] File input clicked');
+  });
+  el.mp4FileInput.addEventListener('change', (e) => {
+    const file = e.target.files?.[0];
+    console.log('[mp4] File input change, file=', file?.name);
+    loadVideoFile(file);
+  });
+
+  // Timeline click to move playhead
+  let isScrubbing = false;
+    const timeFromEvent = (e) => {
+      const wrapRect = el.timelineWrap.getBoundingClientRect();
+      const scroll = el.timelineWrap.scrollLeft || 0;
+      const x = Math.max(0, e.clientX - wrapRect.left);
+      const totalW = el.timeline.scrollWidth || state.timelineWidth || 1;
+      const dur = state.duration || 1;
+      return Math.max(0, Math.min(dur, ((x + scroll) / totalW) * dur));
+    };
+  const seekFromEvent = (e) => {
+    const t = timeFromEvent(e);
+    const dur = state.duration || 1;
+    el.video.currentTime = Math.max(0, Math.min(dur, t));
+  };
+  el.timeline.addEventListener('mousedown', (e) => {
+    if (e.target.classList.contains('handle')) return;
+    isScrubbing = true;
+    seekFromEvent(e);
+  });
+  document.addEventListener('mousemove', (e) => {
+    if (!isScrubbing) return;
+    seekFromEvent(e);
+  });
+  document.addEventListener('mouseup', () => { isScrubbing = false; });
+
+  // Seed with placeholder video/segments if desired
+  const seed = () => {
+    state.videoSrc = '';
+    state.duration = 600; // placeholder until real video loads
+    state.segments = [
+      { id: crypto.randomUUID(), start: 120, end: 124 },
+      { id: crypto.randomUUID(), start: 260, end: 265 },
+      { id: crypto.randomUUID(), start: 490, end: 497 },
+    ];
+    state.selectedId = state.segments[0].id;
+    pushHistory();
+    render();
+  };
+
+  // seed();
+
+  // Export (stub)
+  const exportClips = async () => {
+    if (!state.videoSrc || !state.videoPath) {
+      alert('No video loaded');
+      return;
+    }
+    if (!state.segments.length) {
+      alert('No segments to export');
+      return;
+    }
+    const outdir = el.outdirPath?.value?.trim();
+    if (!outdir) {
+      alert('Choose an output folder first');
+      return;
+    }
+    if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.native) {
+      if (el.sourceStatus) {
+        el.sourceStatus.style.display = 'inline-block';
+        el.sourceStatus.textContent = 'Exporting...';
+      }
+      window.webkit.messageHandlers.native.postMessage({
+        type: 'export',
+        videoPath: state.videoPath,
+        outdir,
+        segments: state.segments.map(({ start, end }) => ({ start, end })),
+      });
+    } else {
+      alert('Native export not available');
+    }
+  };
+
+  el.exportBtn.addEventListener('click', exportClips);
+
+  // Combine: send sdRoot and outdir to native
+  const combine = () => {
+    const sdRoot = el.sdRootPath?.value?.trim();
+    const outdir = el.outdirPath?.value?.trim();
+    if (!sdRoot) {
+      alert('Select SD root first');
+      return;
+    }
+    if (!outdir) {
+      alert('Select output folder first');
+      return;
+    }
+    savePref('lastSdRoot', sdRoot);
+    savePref('lastOutdir', outdir);
+    if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.native) {
+      if (el.sourceStatus) {
+        el.sourceStatus.style.display = 'inline-block';
+        el.sourceStatus.textContent = 'Combining...';
+      }
+      window.webkit.messageHandlers.native.postMessage({ type: 'combine', sdRoot, outdir });
+    } else {
+      alert('Native combine not available');
+    }
+  };
+
+  // called from native when combine finishes
+  window.nativeCombineDone = (ok, msg, combinedPath) => {
+    if (el.sourceStatus) {
+      el.sourceStatus.style.display = 'inline-block';
+      el.sourceStatus.textContent = ok ? 'Combined' : 'Combine failed';
+    }
+    if (msg) console.log('[combine]', msg);
+    if (!ok && msg) alert(msg);
+    if (ok && combinedPath) {
+      console.log('[combine] load combined path', combinedPath);
+      loadVideoFromPath(combinedPath);
+      savePref('lastVideoPath', combinedPath);
+    }
+  };
+  window.nativeDetectProgress = (pct) => {
+    if (el.sourceStatus) {
+      el.sourceStatus.style.display = 'inline-block';
+      const per = Math.round((pct || 0) * 100);
+      el.sourceStatus.textContent = `Detecting... ${per}%`;
+    }
+  };
+  window.nativeDetectDone = (ok, msg, segmentsJSON, segmentsPath) => {
+    if (el.sourceStatus) {
+      el.sourceStatus.style.display = 'inline-block';
+      el.sourceStatus.textContent = ok ? 'Detection done' : 'Detection failed';
+    }
+    if (msg) {
+      console.log('[detect]', msg);
+    }
+    if (!ok && msg) {
+      alert(msg);
+      return;
+    }
+    if (ok) {
+      let parsed = [];
+      if (segmentsJSON) {
+        try {
+          parsed = JSON.parse(segmentsJSON);
+        } catch (err) {
+          console.warn('[detect] failed to parse segments JSON', err);
+        }
+      }
+      if (segmentsPath && el.segmentsPath) {
+        el.segmentsPath.value = segmentsPath;
+      }
+      if (parsed.length) {
+        applySegmentsList(parsed, segmentsPath || 'detection');
+      }
+    }
+  };
+
+  // Wire buttons (Combine/Detection placeholders)
+  const combineButtons = Array.from(document.querySelectorAll('.button')).filter((btn) => btn.textContent && btn.textContent.toLowerCase().includes('combine'));
+  combineButtons.forEach((btn) => btn.addEventListener('click', combine));
+  const detectButtons = Array.from(document.querySelectorAll('.button')).filter((btn) => btn.textContent && btn.textContent.toLowerCase().includes('detection'));
+  const runDetection = () => {
+    const videoPath = state.videoPath || el.mp4Path?.value?.trim();
+    const outdir = el.outdirPath?.value?.trim();
+    if (!videoPath) {
+      alert('Load a video first');
+      return;
+    }
+    if (!outdir) {
+      alert('Select output folder first');
+      return;
+    }
+    savePref('lastOutdir', outdir);
+    if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.native) {
+      if (el.sourceStatus) {
+        el.sourceStatus.style.display = 'inline-block';
+        el.sourceStatus.textContent = 'Detecting...';
+      }
+      window.webkit.messageHandlers.native.postMessage({ type: 'detect', videoPath, outdir });
+    } else {
+      alert('Native detection not available');
+    }
+  };
+  detectButtons.forEach((btn) => btn.addEventListener('click', runDetection));
+  
+
+
+  // Called from native to set absolute video path when user picks file via native picker
+  window.nativeSetVideoPath = (path) => {
+    console.log('[native] video path set', path);
+    loadVideoFromPath(path);
+    savePref('lastVideoPath', path);
+  };
+
+  // Called from native to set SD root after folder pick
+  window.nativeSetSdRoot = (path) => {
+    if (el.sdRootPath) el.sdRootPath.value = path;
+    console.log('[native] sd root set', path);
+    savePref('lastSdRoot', path);
+  };
+
+  window.nativeStartupEnvironment = (pythonOk, pythonMessage, ffmpegOk, ffmpegMessage) => {
+    console.log('[startup] python', pythonOk, pythonMessage);
+    console.log('[startup] ffmpeg', ffmpegOk, ffmpegMessage);
+    if (!el.sourceStatus) return;
+    el.sourceStatus.style.display = 'inline-block';
+    if (!ffmpegOk) {
+      el.sourceStatus.textContent = 'Bundled ffmpeg missing';
+      alert(`Bundled ffmpeg missing\n${ffmpegMessage}`);
+      return;
+    }
+    if (!pythonOk) {
+      el.sourceStatus.textContent = 'Python 3 missing';
+      alert(`python3 is required for Combine / Export / Detection\n${pythonMessage}`);
+      return;
+    }
+    el.sourceStatus.textContent = 'Ready';
+  };
+
+  window.nativeAutoSdRoot = (path) => {
+    if (path && el.sdRootPath) {
+      el.sdRootPath.value = path;
+      savePref('lastSdRoot', path);
+      if (el.sourceStatus) {
+        el.sourceStatus.style.display = 'inline-block';
+        el.sourceStatus.textContent = 'SD detected';
+      }
+    } else {
+        if (el.sourceStatus) {
+          el.sourceStatus.style.display = 'inline-block';
+          el.sourceStatus.textContent = 'No SD found';
+        }
+      alert('No session folder found');
+    }
+  };
+
+  // Called from native when export completes
+  window.nativeExportDone = (ok, msg) => {
+    if (el.sourceStatus) {
+      el.sourceStatus.style.display = 'inline-block';
+      el.sourceStatus.textContent = ok ? 'Exported' : 'Export failed';
+    }
+    if (msg) {
+      console.log('[export]', msg);
+      alert(msg);
+    }
+  };
+
+  window.nativeCombineProgress = (pct) => {
+    if (el.sourceStatus) {
+      el.sourceStatus.style.display = 'inline-block';
+      const per = Math.round(pct * 100);
+      el.sourceStatus.textContent = `Combining... ${per}%`;
+    }
+  };
+
+  window.nativeCleanDone = (ok, msg) => {
+    if (el.sourceStatus) {
+      el.sourceStatus.style.display = 'inline-block';
+      el.sourceStatus.textContent = ok ? 'Cleaned' : 'Clean failed';
+    }
+    if (!ok && msg) alert(msg);
+  };
+
+  // Called from native with combine progress [0..1]
+  
+  // Outdir picker: request native folder picker via message; fallback to prompt.
+  const requestNativeOutdir = () => {
+    if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.native) {
+      try {
+        window.webkit.messageHandlers.native.postMessage({ type: 'pickOutdir' });
+        return true;
+      } catch (err) {
+        console.warn('[outdir] native postMessage failed', err);
+      }
+    }
+    return false;
+  };
+  el.outdirOpenBtn.addEventListener('click', () => {
+    const usedNative = requestNativeOutdir();
+    if (usedNative) return;
+    const current = el.outdirPath?.value || '/';
+    const typed = prompt('Output folder path (full path, e.g., /Users/you/Videos/session)', current);
+    if (typed && el.outdirPath) el.outdirPath.value = typed.trim();
+  });
+
+  
+  const clean = () => {
+    console.log("[clean] handler start", el.sdRootPath?.value);
+    const sdRoot = el.sdRootPath?.value?.trim();
+    if (!sdRoot) { alert('Select SD root first'); return; }
+    let proceed = true;
+    if (typeof window.webkit !== 'undefined' &&
+        window.webkit.messageHandlers &&
+        window.webkit.messageHandlers.native &&
+        typeof window.webkit.messageHandlers.native.postMessage === 'function') {
+      proceed = true;
+    } else if (typeof window.confirm === 'function') {
+      try {
+        proceed = window.confirm(`Delete folder\n${sdRoot}? This cannot be undone.`);
+        console.log('[clean] confirm result', proceed);
+      } catch (err) {
+        console.log('[clean] confirm error', err);
+        proceed = false;
+      }
+    }
+    if (!proceed) return;
+    if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.native) {
+      console.log('[clean] posting to native', sdRoot);
+      if (el.sourceStatus) { el.sourceStatus.style.display = 'inline-block'; el.sourceStatus.textContent = 'Cleaning...'; }
+      window.webkit.messageHandlers.native.postMessage({ type: 'clean', sdRoot });
+    } else {
+      console.log('[clean] no native bridge available');
+      alert('Native clean not available');
+    }
+  };
+  const cleanBtn = document.getElementById('cleanBtn');
+  console.log('[clean] wire button found=', !!cleanBtn);
+  if (cleanBtn) {
+    cleanBtn.addEventListener('click', clean);
+  }
+el.sdAuto.addEventListener('click', () => {
+    const current = el.sdRootPath?.value || '';
+    if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.native) {
+      if (el.sourceStatus) {
+        el.sourceStatus.style.display = 'inline-block';
+        el.sourceStatus.textContent = 'Detecting SD...';
+      }
+      console.log('[sd] requesting auto detect, current=', current);
+      window.webkit.messageHandlers.native.postMessage({ type: 'autoDetectSdRoot', current });
+      return;
+    }
+    // Fallback manual prompt
+    const typed = prompt('SD root path (full path, e.g., /Volumes/SD/...session...)', current || '/Volumes');
+    if (typed && el.sdRootPath) el.sdRootPath.value = typed.trim();
+  });
+  el.sdOpen.addEventListener('click', () => {
+    if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.native) {
+      window.webkit.messageHandlers.native.postMessage({ type: 'pickSdRoot' });
+      return;
+    }
+    const current = el.sdRootPath?.value || '/Volumes';
+    const typed = prompt('SD root path (full path, e.g., /Volumes/SD)', current);
+    if (typed && el.sdRootPath) el.sdRootPath.value = typed.trim();
+  });
+  el.sdLoad.addEventListener('click', () => {
+    const current = el.sdRootPath?.value || '';
+    if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.native) {
+      window.webkit.messageHandlers.native.postMessage({ type: 'autoDetectSdRoot', current });
+      if (el.sourceStatus) {
+        el.sourceStatus.style.display = 'inline-block';
+        el.sourceStatus.textContent = 'Detecting SD...';
+      }
+    } else {
+      alert('Native auto-detect not available');
+    }
+  });
+})();
+</script>
+</html>
