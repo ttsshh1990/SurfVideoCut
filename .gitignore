@@ -2,7 +2,7 @@
 build/
 DerivedData/
 .deriveddata/
-SurfCutMac.zip
+SurfCutMac*.zip
 *.xcuserstate
 xcuserdata/
 *.swp
